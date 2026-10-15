@@ -161,5 +161,13 @@ for p in sorted(glob.glob(R+'images/*.png'),key=lambda p:(p[-20:].count('annotat
     im=XI(p)
     if im.width>1400: im.height=int(im.height*1400/im.width); im.width=1400
     d.add_image(im,'A4')
+from PIL import Image as PI, ImageDraw, ImageFont
+wm=R+'.draft-watermark.png'
+fnt=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',220)
+txt=PI.new('RGBA',(900,300),(0,0,0,0)); ImageDraw.Draw(txt).text((450,150),'DRAFT',font=fnt,fill=(192,0,0,45),anchor='mm')
+txt.rotate(35,expand=True).save(wm)
+for s in wb.worksheets:
+    for top in range(3, max(s.max_row,30)+1, 45):
+        w=XI(wm); w.width,w.height=w.width//2,w.height//2; s.add_image(w,f'A{top+2}')
 for s in wb.worksheets: s.sheet_properties.tabColor='2F5496' if s.title!='Summary' else 'C00000'
 out=R+'codebase-audit-metrics.xlsx'; wb.save(out); print(out,stats)
